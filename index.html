@@ -343,7 +343,7 @@ input[type=number] { -moz-appearance: textfield; }
 // ─────────────────────────────────────────────────────────────────
 //  CONFIGURACIÓN — reemplazar con la URL del Apps Script
 // ─────────────────────────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSvbW0_uu4xOyzMDardybEWf_Ff-Nc7mSLnGOYRbtdc4q0tm7G123nAhTq8KMh-T3x/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwcmE9L2BNaJHZHefqdBged6z-wKczx8tNfhfEErb-szHR8B-5wd7-NO_BLLztbm9Td/exec';
 // ─────────────────────────────────────────────────────────────────
 
 const SOCIOS = {
@@ -384,13 +384,13 @@ function elegirSocio(s) {
 function abrirCarga() {
   const s = SOCIOS[socio];
   document.getElementById('h-name').textContent = s.label;
-  // color de foco en inputs
   document.querySelectorAll('.finput').forEach(el => {
     el.className = el.className.replace(/finput-\w+/g, '').trim();
     el.classList.add('finput-' + socio);
   });
   document.getElementById('btn-reg').style.background = `var(--${socio})`;
   fetchDolar();
+  fetchRecientes();
   show('s-carga');
 }
 
@@ -452,7 +452,23 @@ async function fetchDolar() {
   }
 }
 
-function hintUsd() {
+// ── RECIENTES DESDE SHEET ─────────────────────────────────────
+async function fetchRecientes() {
+  const el = document.getElementById('rlist');
+  el.innerHTML = '<div class="empty" style="color:var(--muted)">Cargando…</div>';
+  try {
+    const res  = await fetch(SCRIPT_URL + '?accion=recientes&socio=' + socio + '&t=' + Date.now());
+    const data = await res.json();
+    if (data.movs && data.movs.length) {
+      sesion = data.movs;
+      renderSesion();
+    } else {
+      el.innerHTML = '<div class="empty">Todavía no hay gastos registrados</div>';
+    }
+  } catch {
+    el.innerHTML = '<div class="empty">No se pudieron cargar los movimientos</div>';
+  }
+}
   const monto = parseFloat(document.getElementById('inp-monto').value);
   const el    = document.getElementById('usd-hint');
   if (!monto || monto <= 0 || !dolar) { el.innerHTML = ''; return; }
@@ -484,14 +500,13 @@ async function registrar() {
       body:    JSON.stringify({ accion: 'registrar', socio, det, monto, dolar: dolar || '', usd: usd || '', fecha, hora })
     });
     // no-cors: si no lanzó error, asumimos éxito
-    sesion.unshift({ det, monto, usd, fecha, hora });
-    if (sesion.length > 10) sesion.pop();
-    renderSesion();
     toast(`✓ ${fmtARS(monto)} registrado${usd ? '  ·  U$S ' + fmt(usd, 2) : ''}`, 'ok');
     document.getElementById('inp-det').value   = '';
     document.getElementById('inp-monto').value = '';
     document.getElementById('usd-hint').innerHTML = '';
     document.getElementById('inp-det').focus();
+    // Espera 1s para que el Sheet procese y refresca
+    setTimeout(fetchRecientes, 1000);
   } catch {
     toast('Error al guardar. Revisá tu conexión.', 'err');
   } finally {
@@ -598,6 +613,12 @@ document.getElementById('inp-monto').addEventListener('keydown', e => { if (e.ke
 
 // Refresca dólar cada 5 min si la pantalla de carga está activa
 setInterval(() => { if (document.getElementById('s-carga').classList.contains('active')) fetchDolar(); }, 5 * 60 * 1000);
+
+// Auto-refresca resultados cada 60s si esa pantalla está visible
+setInterval(() => { if (document.getElementById('s-resultados').classList.contains('active')) cargarResultados(); }, 60 * 1000);
+
+// Auto-refresca recientes cada 60s si la pantalla de carga está activa
+setInterval(() => { if (document.getElementById('s-carga').classList.contains('active')) fetchRecientes(); }, 60 * 1000);
 </script>
 </body>
 </html>
