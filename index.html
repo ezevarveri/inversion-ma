@@ -469,6 +469,8 @@ async function fetchRecientes() {
     el.innerHTML = '<div class="empty">No se pudieron cargar los movimientos</div>';
   }
 }
+
+function hintUsd() {
   const monto = parseFloat(document.getElementById('inp-monto').value);
   const el    = document.getElementById('usd-hint');
   if (!monto || monto <= 0 || !dolar) { el.innerHTML = ''; return; }
