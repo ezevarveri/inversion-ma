@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Inversión Mariantonia</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F4F1EB;
+  --surface: #FFFFFF;
+  --border: #E2DBD2;
+  --text: #17150E;
+  --muted: #7A746B;
+  --eze:  #1E4FA8; --eze-bg:  #EAF0FB;
+  --andy: #1A7A47; --andy-bg: #E0F2E9;
+  --juan: #7A2E8E; --juan-bg: #F2E5F7;
+  --gold: #B8880A; --gold-bg: #FDF3D8;
+  --danger-bg: #FBE9E7; --danger: #C0391B;
+  --r: 14px; --rsm: 9px;
+}
+
+html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+
+/* ── SCREENS ─────────────────────────── */
+.screen { display: none; min-height: 100vh; flex-direction: column; animation: fadeIn .18s ease; }
+.screen.active { display: flex; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ── SELECTOR ────────────────────────── */
+#s-selector { justify-content: center; align-items: center; padding: 40px 24px 60px; }
+.logo { text-align: center; margin-bottom: 44px; }
+.logo-wordmark { font-family: 'DM Serif Display', serif; font-size: 32px; letter-spacing: -0.5px; line-height: 1; }
+.logo-sub { font-size: 11px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; margin-top: 6px; }
+.sel-prompt { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; font-weight: 500; text-align: center; margin-bottom: 16px; }
+.sel-list { display: flex; flex-direction: column; gap: 11px; width: 100%; max-width: 310px; }
+.sel-card {
+  display: flex; align-items: center; gap: 15px;
+  padding: 17px 18px; border-radius: var(--r);
+  border: 1.5px solid var(--border); background: var(--surface);
+  cursor: pointer; font-family: 'DM Sans', sans-serif; width: 100%;
+  transition: border-color .15s, transform .1s;
+  text-align: left;
+}
+.sel-card:active { transform: scale(.97); }
+.sel-card[data-s="eze"]:hover  { border-color: var(--eze);  }
+.sel-card[data-s="andy"]:hover { border-color: var(--andy); }
+.sel-card[data-s="juan"]:hover { border-color: var(--juan); }
+.sel-card[data-s="res"]:hover  { border-color: var(--text); }
+.sel-card[data-s="res"] { border-style: dashed; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; flex-shrink: 0; }
+.sel-name { font-size: 16px; font-weight: 600; line-height: 1.2; }
+.sel-role { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* ── APP HEADER ──────────────────────── */
+.header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 13px 15px 11px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 50;
+}
+.btn-icon {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; color: var(--muted);
+  font-size: 18px; font-family: sans-serif; line-height: 1;
+  transition: background .12s;
+}
+.btn-icon:hover { background: var(--border); }
+.hinfo { flex: 1; min-width: 0; }
+.hname { font-weight: 600; font-size: 15px; }
+.hsub  { font-size: 11px; color: var(--muted); }
+.btn-pill {
+  padding: 7px 13px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--bg);
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+  cursor: pointer; color: var(--muted); white-space: nowrap;
+  transition: background .12s, color .12s, border-color .12s;
+}
+.btn-pill:hover { background: var(--text); color: #fff; border-color: var(--text); }
+
+/* ── CARGA ───────────────────────────── */
+#s-carga { flex-direction: column; }
+.body-wrap { flex: 1; padding: 20px 16px 64px; max-width: 480px; width: 100%; margin: 0 auto; }
+
+.dolar-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--gold-bg); border: 1px solid #ECD99A;
+  border-radius: 20px; padding: 6px 12px;
+  font-size: 12px; color: var(--gold); font-weight: 500;
+  margin-bottom: 16px;
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.dot-ok   { background: var(--gold); }
+.dot-spin { background: #CCC; animation: blink 1s infinite; }
+.dot-err  { background: #E24B4A; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 18px; margin-bottom: 14px; }
+.frow { margin-bottom: 14px; }
+.frow:last-child { margin-bottom: 0; }
+.flabel { display: block; font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.finput {
+  width: 100%; border: 1.5px solid var(--border); border-radius: var(--rsm);
+  padding: 13px 14px; font-family: 'DM Sans', sans-serif; font-size: 16px;
+  color: var(--text); background: var(--bg); outline: none;
+  transition: border-color .15s, background .15s; -webkit-appearance: none;
+}
+.finput:focus { background: #fff; }
+.finput::placeholder { color: #BDB6AC; }
+.finput-eze:focus   { border-color: var(--eze);  }
+.finput-andy:focus  { border-color: var(--andy); }
+.finput-juan:focus  { border-color: var(--juan); }
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+input[type=number] { -moz-appearance: textfield; }
+.pfx-wrap { position: relative; }
+.pfx { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--muted); pointer-events: none; font-weight: 500; }
+.pfx-input { padding-left: 28px !important; }
+.usd-hint { font-size: 12px; color: var(--muted); margin-top: 5px; min-height: 16px; }
+.usd-hint b { color: var(--gold); font-weight: 600; }
+
+.btn-reg {
+  width: 100%; padding: 16px; border-radius: var(--r); border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600;
+  cursor: pointer; color: #fff; transition: opacity .15s, transform .1s;
+}
+.btn-reg:active { transform: scale(.98); }
+.btn-reg:disabled { opacity: .4; cursor: not-allowed; }
+
+.toast {
+  margin-top: 10px; padding: 11px 14px; border-radius: var(--rsm);
+  font-size: 13px; font-weight: 500; display: none; text-align: center;
+}
+.toast-ok   { background: #E0F2E9; color: #1A7A47; }
+.toast-err  { background: var(--danger-bg); color: var(--danger); }
+.toast-load { background: #F0EDE6; color: var(--muted); }
+
+.sec-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.rlist { display: flex; flex-direction: column; gap: 8px; }
+.ritem { background: var(--surface); border: 1px solid var(--border); border-radius: var(--rsm); padding: 12px 14px; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.rdetail { font-size: 14px; font-weight: 500; line-height: 1.3; }
+.rmeta   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.rars    { font-size: 14px; font-weight: 600; text-align: right; white-space: nowrap; }
+.rusd    { font-size: 11px; color: var(--muted); text-align: right; margin-top: 1px; }
+.empty   { text-align: center; color: var(--muted); font-size: 13px; padding: 22px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--rsm); }
+
+/* ── RESULTADOS ──────────────────────── */
+#s-resultados { flex-direction: column; }
+.res-wrap { flex: 1; padding: 20px 16px 64px; max-width: 480px; width: 100%; margin: 0 auto; }
+.global-box { background: var(--text); border-radius: var(--r); padding: 24px 20px; margin-bottom: 20px; text-align: center; color: #F4F1EB; }
+.g-label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #555; margin-bottom: 5px; }
+.g-ars   { font-family: 'DM Serif Display', serif; font-size: 38px; line-height: 1; }
+.g-usd   { font-size: 14px; color: var(--gold); margin-top: 8px; font-weight: 500; }
+.g-ts    { font-size: 11px; color: #444; margin-top: 8px; }
+.scards  { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.scard   { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 15px 16px; }
+.scard-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.scard-ava { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; flex-shrink: 0; }
+.scard-name { font-size: 14px; font-weight: 600; }
+.scard-movs { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.scard-nums { margin-left: auto; text-align: right; }
+.scard-ars  { font-size: 18px; font-weight: 600; line-height: 1; }
+.scard-usd  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.bar-bg   { background: var(--bg); border-radius: 3px; height: 5px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; width: 0; transition: width .9s cubic-bezier(.16,1,.3,1); }
+.pct-row  { font-size: 11px; color: var(--muted); margin-top: 4px; text-align: right; }
+.note { background: var(--gold-bg); border: 1px solid #ECD99A; border-radius: var(--rsm); padding: 11px 14px; font-size: 12px; color: #7A6010; display: flex; gap: 9px; align-items: flex-start; margin-bottom: 14px; }
+.btn-reload { width: 100%; padding: 13px; background: none; border: 1.5px solid var(--border); border-radius: var(--rsm); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--muted); cursor: pointer; font-weight: 500; transition: border-color .15s, color .15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-reload:hover { border-color: var(--text); color: var(--text); }
+
+/* ── SPINNER ─────────────────────────── */
+.spin { display: inline-block; width: 13px; height: 13px; border: 2px solid #ddd; border-top-color: #999; border-radius: 50%; animation: rot .7s linear infinite; vertical-align: middle; margin-right: 4px; }
+@keyframes rot { to { transform: rotate(360deg); } }
+
+/* ── CAMBIAR SOCIO LINK ───────────────── */
+.cambiar-link { text-align: center; margin-top: 20px; font-size: 12px; color: var(--muted); }
+.cambiar-link button { background: none; border: none; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.cambiar-link button:hover { color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- ══ SELECTOR ══════════════════════════════════════════════ -->
+<div id="s-selector" class="screen">
+  <div class="logo">
+    <div class="logo-wordmark">Mariantonia</div>
+    <div class="logo-sub">Control de inversión · Quilmes Centro</div>
+  </div>
+  <div class="sel-prompt">¿Quién sos?</div>
+  <div class="sel-list">
+    <button class="sel-card" data-s="eze" onclick="elegirSocio('eze')">
+      <div class="avatar" style="background:var(--eze-bg);color:var(--eze)">E</div>
+      <div><div class="sel-name">Eze</div><div class="sel-role">Producción y distribución</div></div>
+    </button>
+    <button class="sel-card" data-s="andy" onclick="elegirSocio('andy')">
+      <div class="avatar" style="background:var(--andy-bg);color:var(--andy)">A</div>
+      <div><div class="sel-name">Andy</div><div class="sel-role">Marketing y comercialización</div></div>
+    </button>
+    <button class="sel-card" data-s="juan" onclick="elegirSocio('juan')">
+      <div class="avatar" style="background:var(--juan-bg);color:var(--juan)">J</div>
+      <div><div class="sel-name">Juan</div><div class="sel-role">Chef</div></div>
+    </button>
+    <button class="sel-card" data-s="res" onclick="abrirResultados(null)">
+      <div class="avatar" style="background:#EEEAE3;color:var(--muted)">
+        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div><div class="sel-name" style="font-size:15px">Ver resultados</div><div class="sel-role">Totales de los 3 socios</div></div>
+    </button>
+  </div>
+</div>
+
+<!-- ══ CARGA ══════════════════════════════════════════════════ -->
+<div id="s-carga" class="screen">
+  <div class="header">
+    <button class="btn-icon" onclick="irSelector()" title="Cambiar socio" aria-label="Cambiar socio">←</button>
+    <div class="hinfo">
+      <div class="hname" id="h-name">—</div>
+      <div class="hsub">Inversión Mariantonia · Quilmes</div>
+    </div>
+    <button class="btn-pill" onclick="abrirResultados('carga')">Ver totales</button>
+  </div>
+
+  <div class="body-wrap">
+    <div class="dolar-pill">
+      <div class="dot dot-spin" id="d-dot"></div>
+      <span id="d-txt">Consultando dólar blue…</span>
+    </div>
+
+    <div class="card">
+      <div class="frow">
+        <label class="flabel" for="inp-det">Detalle del gasto</label>
+        <input class="finput" id="inp-det" type="text" placeholder="ej: pintura, electricista, cerámica…" autocomplete="off" autocorrect="off" spellcheck="false">
+      </div>
+      <div class="frow">
+        <label class="flabel" for="inp-monto">Monto en pesos</label>
+        <div class="pfx-wrap">
+          <span class="pfx">$</span>
+          <input class="finput pfx-input" id="inp-monto" type="number" placeholder="0" inputmode="decimal" oninput="hintUsd()">
+        </div>
+        <div class="usd-hint" id="usd-hint"></div>
+      </div>
+    </div>
+
+    <button class="btn-reg" id="btn-reg" onclick="registrar()">Registrar gasto</button>
+    <div class="toast" id="toast"></div>
+
+    <div style="margin-top:22px">
+      <div class="sec-label">Cargado esta sesión</div>
+      <div class="rlist" id="rlist"><div class="empty">Todavía no cargaste gastos hoy</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ RESULTADOS ═════════════════════════════════════════════ -->
+<div id="s-resultados" class="screen">
+  <div class="header">
+    <button class="btn-icon" id="btn-back-res" onclick="volverDeResultados()">←</button>
+    <div class="hinfo">
+      <div class="hname">Resumen de inversión</div>
+      <div class="hsub">Mariantonia · Quilmes Centro</div>
+    </div>
+  </div>
+
+  <div class="res-wrap">
+    <div class="global-box">
+      <div class="g-label">Total invertido entre los 3</div>
+      <div class="g-ars" id="g-ars">—</div>
+      <div class="g-usd" id="g-usd">— USD</div>
+      <div class="g-ts"  id="g-ts">Cargando…</div>
+    </div>
+
+    <div class="scards" id="scards"><div class="empty">Cargando datos…</div></div>
+
+    <div class="note">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Cada gasto se convierte al dólar blue del momento exacto del registro. El total USD suma esas conversiones individuales, no una cotización actual.
+    </div>
+
+    <button class="btn-reload" onclick="cargarResultados()">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+      Actualizar datos
+    </button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────
+//  CONFIGURACIÓN — reemplazar con la URL del Apps Script
+// ─────────────────────────────────────────────────────────────────
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSvbW0_uu4xOyzMDardybEWf_Ff-Nc7mSLnGOYRbtdc4q0tm7G123nAhTq8KMh-T3x/exec';
+// ─────────────────────────────────────────────────────────────────
+
+const SOCIOS = {
+  eze:  { label: 'Eze',  color: 'var(--eze)',  bg: 'var(--eze-bg)'  },
+  andy: { label: 'Andy', color: 'var(--andy)', bg: 'var(--andy-bg)' },
+  juan: { label: 'Juan', color: 'var(--juan)', bg: 'var(--juan-bg)' }
+};
+
+let socio     = null;   // socio activo en esta sesión
+let dolar     = null;   // cotización blue actual
+let sesion    = [];     // movimientos cargados en esta sesión
+let origenRes = null;   // de dónde se abrió la pantalla de resultados
+
+// ── INIT ──────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const guardado = localStorage.getItem('ma_socio');
+  if (guardado && SOCIOS[guardado]) {
+    socio = guardado;
+    abrirCarga();
+  } else {
+    show('s-selector');
+  }
+});
+
+// ── NAVEGACIÓN ────────────────────────────────────────────────
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function elegirSocio(s) {
+  socio = s;
+  localStorage.setItem('ma_socio', s);
+  abrirCarga();
+}
+
+function abrirCarga() {
+  const s = SOCIOS[socio];
+  document.getElementById('h-name').textContent = s.label;
+  // color de foco en inputs
+  document.querySelectorAll('.finput').forEach(el => {
+    el.className = el.className.replace(/finput-\w+/g, '').trim();
+    el.classList.add('finput-' + socio);
+  });
+  document.getElementById('btn-reg').style.background = `var(--${socio})`;
+  fetchDolar();
+  show('s-carga');
+}
+
+function irSelector() {
+  // No borra localStorage — sólo va al selector por esta sesión
+  show('s-selector');
+}
+
+function abrirResultados(origen) {
+  origenRes = origen;
+  cargarResultados();
+  show('s-resultados');
+}
+
+function volverDeResultados() {
+  if (origenRes === 'carga') {
+    show('s-carga');
+  } else {
+    show('s-selector');
+  }
+}
+
+// ── DÓLAR BLUE ────────────────────────────────────────────────
+async function fetchDolar() {
+  const dot = document.getElementById('d-dot');
+  const txt = document.getElementById('d-txt');
+  dot.className = 'dot dot-spin';
+  txt.textContent = 'Consultando dólar blue…';
+  try {
+    const res = await fetch('https://dolarapi.com/v1/dolares/blue');
+    const d   = await res.json();
+    dolar = d.venta;
+    const h = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+    dot.className = 'dot dot-ok';
+    txt.textContent = `Blue $${fmt(dolar, 0)} · act. ${h}`;
+    hintUsd();
+  } catch {
+    dot.className = 'dot dot-err';
+    txt.textContent = 'Sin datos del dólar blue';
+    dolar = null;
+  }
+}
+
+function hintUsd() {
+  const monto = parseFloat(document.getElementById('inp-monto').value);
+  const el    = document.getElementById('usd-hint');
+  if (!monto || monto <= 0 || !dolar) { el.innerHTML = ''; return; }
+  el.innerHTML = `≈ <b>U$S ${fmt(monto / dolar, 2)}</b> al blue de hoy`;
+}
+
+// ── REGISTRAR GASTO ───────────────────────────────────────────
+async function registrar() {
+  const det   = document.getElementById('inp-det').value.trim();
+  const monto = parseFloat(document.getElementById('inp-monto').value);
+  const btn   = document.getElementById('btn-reg');
+
+  if (!det)              return toast('Escribí el detalle del gasto', 'err');
+  if (!monto || monto <= 0) return toast('Ingresá un monto válido', 'err');
+
+  const usd   = dolar ? parseFloat((monto / dolar).toFixed(2)) : null;
+  const ahora = new Date();
+  const fecha = ahora.toLocaleDateString('es-AR');
+  const hora  = ahora.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+
+  btn.disabled = true;
+  toast('<span class="spin"></span>Guardando…', 'load');
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method:  'POST',
+      mode:    'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ accion: 'registrar', socio, det, monto, dolar: dolar || '', usd: usd || '', fecha, hora })
+    });
+    // no-cors: si no lanzó error, asumimos éxito
+    sesion.unshift({ det, monto, usd, fecha, hora });
+    if (sesion.length > 10) sesion.pop();
+    renderSesion();
+    toast(`✓ ${fmtARS(monto)} registrado${usd ? '  ·  U$S ' + fmt(usd, 2) : ''}`, 'ok');
+    document.getElementById('inp-det').value   = '';
+    document.getElementById('inp-monto').value = '';
+    document.getElementById('usd-hint').innerHTML = '';
+    document.getElementById('inp-det').focus();
+  } catch {
+    toast('Error al guardar. Revisá tu conexión.', 'err');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function toast(msg, tipo) {
+  const el = document.getElementById('toast');
+  el.innerHTML  = msg;
+  el.className  = 'toast toast-' + (tipo === 'ok' ? 'ok' : tipo === 'err' ? 'err' : 'load');
+  el.style.display = 'block';
+  if (tipo === 'ok') setTimeout(() => el.style.display = 'none', 3500);
+}
+
+function renderSesion() {
+  const el = document.getElementById('rlist');
+  if (!sesion.length) {
+    el.innerHTML = '<div class="empty">Todavía no cargaste gastos hoy</div>';
+    return;
+  }
+  const c = SOCIOS[socio].color;
+  el.innerHTML = sesion.map(m => `
+    <div class="ritem">
+      <div style="min-width:0">
+        <div class="rdetail">${m.det}</div>
+        <div class="rmeta">${m.fecha} · ${m.hora}</div>
+      </div>
+      <div style="flex-shrink:0">
+        <div class="rars" style="color:${c}">${fmtARS(m.monto)}</div>
+        ${m.usd ? `<div class="rusd">U$S ${fmt(m.usd, 2)}</div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+// ── RESULTADOS ────────────────────────────────────────────────
+async function cargarResultados() {
+  document.getElementById('g-ts').textContent    = 'Actualizando…';
+  document.getElementById('scards').innerHTML    = '<div class="empty">Cargando datos…</div>';
+  document.getElementById('g-ars').textContent   = '—';
+  document.getElementById('g-usd').textContent   = '— USD';
+  try {
+    const res  = await fetch(SCRIPT_URL + '?accion=totales&t=' + Date.now());
+    const data = await res.json();
+    renderResultados(data);
+  } catch {
+    document.getElementById('g-ts').textContent = 'Error al cargar — revisá conexión';
+    document.getElementById('scards').innerHTML = '<div class="empty">No se pudieron obtener los datos.</div>';
+  }
+}
+
+function renderResultados(data) {
+  let totalArs = 0, totalUsd = 0;
+  ['eze','andy','juan'].forEach(k => { totalArs += data[k]?.ars || 0; totalUsd += data[k]?.usd || 0; });
+
+  document.getElementById('g-ars').textContent = fmtARS(totalArs);
+  document.getElementById('g-usd').textContent = 'U$S ' + fmt(totalUsd, 2);
+  document.getElementById('g-ts').textContent  = 'Actualizado ' + new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+
+  document.getElementById('scards').innerHTML = ['eze','andy','juan'].map(k => {
+    const s   = SOCIOS[k];
+    const d   = data[k] || { ars: 0, usd: 0, movs: 0 };
+    const pct = totalArs > 0 ? Math.round(d.ars / totalArs * 100) : 0;
+    return `
+      <div class="scard">
+        <div class="scard-top">
+          <div class="scard-ava" style="background:${s.bg};color:${s.color}">${s.label[0]}</div>
+          <div>
+            <div class="scard-name">${s.label}</div>
+            <div class="scard-movs">${d.movs || 0} movimiento${(d.movs||0) !== 1 ? 's' : ''}</div>
+          </div>
+          <div class="scard-nums">
+            <div class="scard-ars" style="color:${s.color}">${fmtARS(d.ars)}</div>
+            <div class="scard-usd">U$S ${fmt(d.usd || 0, 2)}</div>
+          </div>
+        </div>
+        <div class="bar-bg"><div class="bar-fill" id="bar-${k}" style="background:${s.color}"></div></div>
+        <div class="pct-row">${pct}% del total</div>
+      </div>`;
+  }).join('');
+
+  // Animar barras con micro delay para que la transición CSS se dispare
+  requestAnimationFrame(() => {
+    ['eze','andy','juan'].forEach(k => {
+      const d   = data[k] || { ars: 0 };
+      const pct = totalArs > 0 ? Math.round(d.ars / totalArs * 100) : 0;
+      const el  = document.getElementById('bar-' + k);
+      if (el) setTimeout(() => el.style.width = pct + '%', 60);
+    });
+  });
+}
+
+// ── UTILS ─────────────────────────────────────────────────────
+function fmtARS(n) {
+  return '$ ' + Math.round(n).toLocaleString('es-AR');
+}
+function fmt(n, dec) {
+  return parseFloat(n).toLocaleString('es-AR', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+
+// Enter: detalle → foco monto; monto → registrar
+document.getElementById('inp-det').addEventListener('keydown',   e => { if (e.key === 'Enter') document.getElementById('inp-monto').focus(); });
+document.getElementById('inp-monto').addEventListener('keydown', e => { if (e.key === 'Enter') registrar(); });
+
+// Refresca dólar cada 5 min si la pantalla de carga está activa
+setInterval(() => { if (document.getElementById('s-carga').classList.contains('active')) fetchDolar(); }, 5 * 60 * 1000);
+</script>
+</body>
+</html>
