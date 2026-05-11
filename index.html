@@ -33,7 +33,7 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
 /* ── SELECTOR ────────────────────────── */
 #s-selector { justify-content: center; align-items: center; padding: 40px 24px 60px; }
 .logo { text-align: center; margin-bottom: 44px; }
-.logo-wordmark { font-family: 'DM Serif Display', serif; font-size: 32px; letter-spacing: -0.5px; line-height: 1; }
+.logo-wordmark { font-family: 'DM Sans', sans-serif; font-size: 30px; font-weight: 600; letter-spacing: -0.5px; line-height: 1; color: #1A2E6E; }
 .logo-sub { font-size: 11px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; margin-top: 6px; }
 .sel-prompt { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; font-weight: 500; text-align: center; margin-bottom: 16px; }
 .sel-list { display: flex; flex-direction: column; gap: 11px; width: 100%; max-width: 310px; }
@@ -62,18 +62,50 @@ html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(-
   background: var(--surface); border-bottom: 1px solid var(--border);
   position: sticky; top: 0; z-index: 50;
 }
-.btn-icon {
-  width: 34px; height: 34px; border-radius: 50%;
-  border: 1px solid var(--border); background: var(--bg);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; flex-shrink: 0; color: var(--muted);
-  font-size: 18px; font-family: sans-serif; line-height: 1;
-  transition: background .12s;
-}
-.btn-icon:hover { background: var(--border); }
+.cambiar-link { text-align: center; margin-top: 24px; padding-bottom: 8px; }
+.cambiar-link button { background: none; border: none; font-family: 'DM Sans', sans-serif; font-size: 13px; color: #1E4FA8; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; padding: 4px; }
+.cambiar-link button:hover { color: #0f2f6a; }
+
+/* Modal confirm */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; align-items: center; justify-content: center; padding: 24px; }
+.modal-overlay.active { display: flex; }
+.modal-box { background: var(--surface); border-radius: var(--r); padding: 24px 22px 20px; max-width: 300px; width: 100%; }
+.modal-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.modal-msg   { font-size: 14px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
+.modal-btns  { display: flex; gap: 10px; }
+.modal-btn   { flex: 1; padding: 12px; border-radius: var(--rsm); border: 1.5px solid var(--border); background: none; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .12s, color .12s; }
+.modal-btn-si  { background: var(--text); color: #fff; border-color: var(--text); }
+.modal-btn-si:hover  { background: #333; }
+.modal-btn-no:hover  { background: var(--bg); }
 .hinfo { flex: 1; min-width: 0; }
 .hname { font-weight: 600; font-size: 15px; }
 .hsub  { font-size: 11px; color: var(--muted); }
+
+/* ── DESKTOP RESPONSIVE ──────────────── */
+@media (min-width: 720px) {
+  .body-wrap, .res-wrap { max-width: 600px; padding-left: 24px; padding-right: 24px; }
+  .header { padding: 14px 24px 12px; }
+  #s-selector { padding: 60px 24px 80px; }
+  .sel-list { max-width: 360px; }
+  .card { padding: 22px; }
+  .global-box { padding: 28px 24px; }
+  .g-ars { font-size: 44px; }
+}
+@media (min-width: 1080px) {
+  #s-carga .body-wrap {
+    max-width: 960px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 32px;
+    align-items: start;
+  }
+  .dolar-pill   { grid-column: 1 / -1; }
+  .card         { grid-column: 1; grid-row: 2; margin-bottom: 0; }
+  #btn-reg      { grid-column: 1; grid-row: 3; }
+  #toast        { grid-column: 1; grid-row: 4; }
+  .sec-wrap     { grid-column: 2; grid-row: 2 / 5; }
+  .res-wrap     { max-width: 700px; }
+}
 .btn-pill {
   padding: 7px 13px; border-radius: 20px;
   border: 1px solid var(--border); background: var(--bg);
@@ -172,6 +204,7 @@ input[type=number] { -moz-appearance: textfield; }
 .note { background: var(--gold-bg); border: 1px solid #ECD99A; border-radius: var(--rsm); padding: 11px 14px; font-size: 12px; color: #7A6010; display: flex; gap: 9px; align-items: flex-start; margin-bottom: 14px; }
 .btn-reload { width: 100%; padding: 13px; background: none; border: 1.5px solid var(--border); border-radius: var(--rsm); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--muted); cursor: pointer; font-weight: 500; transition: border-color .15s, color .15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
 .btn-reload:hover { border-color: var(--text); color: var(--text); }
+.sec-wrap { margin-top: 22px; }
 
 /* ── SPINNER ─────────────────────────── */
 .spin { display: inline-block; width: 13px; height: 13px; border: 2px solid #ddd; border-top-color: #999; border-radius: 50%; animation: rot .7s linear infinite; vertical-align: middle; margin-right: 4px; }
@@ -195,15 +228,15 @@ input[type=number] { -moz-appearance: textfield; }
   <div class="sel-list">
     <button class="sel-card" data-s="eze" onclick="elegirSocio('eze')">
       <div class="avatar" style="background:var(--eze-bg);color:var(--eze)">E</div>
-      <div><div class="sel-name">Eze</div><div class="sel-role">Producción y distribución</div></div>
+      <div><div class="sel-name">Eze</div></div>
     </button>
     <button class="sel-card" data-s="andy" onclick="elegirSocio('andy')">
       <div class="avatar" style="background:var(--andy-bg);color:var(--andy)">A</div>
-      <div><div class="sel-name">Andy</div><div class="sel-role">Marketing y comercialización</div></div>
+      <div><div class="sel-name">Andy</div></div>
     </button>
     <button class="sel-card" data-s="juan" onclick="elegirSocio('juan')">
       <div class="avatar" style="background:var(--juan-bg);color:var(--juan)">J</div>
-      <div><div class="sel-name">Juan</div><div class="sel-role">Chef</div></div>
+      <div><div class="sel-name">Juan</div></div>
     </button>
     <button class="sel-card" data-s="res" onclick="abrirResultados(null)">
       <div class="avatar" style="background:#EEEAE3;color:var(--muted)">
@@ -217,7 +250,6 @@ input[type=number] { -moz-appearance: textfield; }
 <!-- ══ CARGA ══════════════════════════════════════════════════ -->
 <div id="s-carga" class="screen">
   <div class="header">
-    <button class="btn-icon" onclick="irSelector()" title="Cambiar socio" aria-label="Cambiar socio">←</button>
     <div class="hinfo">
       <div class="hname" id="h-name">—</div>
       <div class="hsub">Inversión Mariantonia · Quilmes</div>
@@ -249,10 +281,28 @@ input[type=number] { -moz-appearance: textfield; }
     <button class="btn-reg" id="btn-reg" onclick="registrar()">Registrar gasto</button>
     <div class="toast" id="toast"></div>
 
-    <div style="margin-top:22px">
+    <div class="sec-wrap">
       <div class="sec-label">Cargado esta sesión</div>
       <div class="rlist" id="rlist"><div class="empty">Todavía no cargaste gastos hoy</div></div>
     </div>
+
+    <div class="cambiar-link">
+      <button onclick="pedirConfirmacion()">No soy yo — cambiar de socio</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL CONFIRMAR CAMBIO ════════════════════════════════ -->
+<div class="modal-overlay" id="modal-cambiar">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title">¿Cambiar de socio?</div>
+    <div class="modal-msg"  id="modal-msg">¿Seguro que querés cambiar?</div>
+    <div class="modal-btns">
+      <button class="modal-btn modal-btn-no" onclick="cerrarModal()">No</button>
+      <button class="modal-btn modal-btn-si" onclick="confirmarCambio()">Sí</button>
+    </div>
+  </div>
+</div>
 
   </div>
 </div>
@@ -345,7 +395,25 @@ function abrirCarga() {
 }
 
 function irSelector() {
-  // No borra localStorage — sólo va al selector por esta sesión
+  show('s-selector');
+}
+
+function pedirConfirmacion() {
+  const nombre = SOCIOS[socio]?.label || socio;
+  document.getElementById('modal-title').textContent = `¿No sos ${nombre}?`;
+  document.getElementById('modal-msg').textContent   = `¿Seguro que querés cambiar de socio?`;
+  document.getElementById('modal-cambiar').classList.add('active');
+}
+
+function cerrarModal() {
+  document.getElementById('modal-cambiar').classList.remove('active');
+}
+
+function confirmarCambio() {
+  cerrarModal();
+  localStorage.removeItem('ma_socio');
+  socio = null;
+  sesion = [];
   show('s-selector');
 }
 
